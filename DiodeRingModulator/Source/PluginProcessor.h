@@ -67,7 +67,7 @@ public:
     juce::AudioProcessorValueTreeState audioTree;
 
 private:
-    double controlledGain, controlledC, controlledM;
+    double controlledGain, controlledC, controlledM, controlledInput;
     double Id, C, C_p, L, rhoM, rhoA, rhoI, R_m, R_a, R_i, alpha, Ve, Vp, R, err;
     double Fs, T;
 

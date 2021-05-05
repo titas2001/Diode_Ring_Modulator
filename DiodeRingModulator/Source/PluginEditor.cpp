@@ -25,6 +25,10 @@ DiodeRingModulatorAudioProcessorEditor::DiodeRingModulatorAudioProcessorEditor(D
   textBoxOutlineColourId = 0x1001700 }
 */
 
+
+
+
+
     controlGain.setColour(0x1001400, juce::Colour::fromRGBA(0x00, 0x40, 0x00, 0x80));
     controlGain.setColour(0x1001700, juce::Colour::fromRGBA(0x00, 0x00, 0x00, 0x00));
     controlM.setColour(0x1001400, juce::Colour::fromRGBA(0x00, 0x40, 0x00, 0x80));
@@ -34,6 +38,30 @@ DiodeRingModulatorAudioProcessorEditor::DiodeRingModulatorAudioProcessorEditor(D
 
     // these define the parameters of our slider object
 
+    inputToggle.setText(("Use microphone as input or the sine wave"), juce::dontSendNotification);
+    inputToggle.setFont(juce::Font("Slope Opera", 16, 0));
+    inputToggle.setColour(juce::Label::textColourId, juce::Colour::fromRGBA(0x40, 0x40, 0x80, 0xff));
+    addAndMakeVisible(inputToggle);
+
+    micInput.setText(("Microphone"), juce::dontSendNotification);
+    micInput.setFont(juce::Font("Slope Opera", 16, 0));
+    micInput.setColour(juce::Label::textColourId, juce::Colour::fromRGBA(0x40, 0x40, 0x80, 0xff));
+    addAndMakeVisible(micInput);
+
+    sineInput.setText(("Sine wave"), juce::dontSendNotification);
+    sineInput.setFont(juce::Font("Slope Opera", 16, 0));
+    sineInput.setColour(juce::Label::textColourId, juce::Colour::fromRGBA(0x40, 0x40, 0x80, 0xff));
+    addAndMakeVisible(sineInput);
+
+    useInput.setSliderStyle(juce::Slider::LinearHorizontal);
+    useInput.addListener(this);
+    useInput.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    addAndMakeVisible(useInput);
+    useInputAttach.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioTree, "useInput_ID", useInput));
+    //controlR.setPopupDisplayEnabled(true, false, this);
+
+    //useInputAttach.reset(new juce::AudioProcessorValueTreeState::ButtonAttachment(audioTree, "useInput_ID", useInput));
+        
     controlGain.setSliderStyle(juce::Slider::LinearHorizontal);
     controlGain.addListener(this);
     controlGain.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 60, 20);
@@ -75,6 +103,7 @@ DiodeRingModulatorAudioProcessorEditor::~DiodeRingModulatorAudioProcessorEditor(
     sliderAttachC.reset();
     sliderAttachM.reset();
     sliderAttachGain.reset();
+
 }
 
 //==============================================================================
@@ -90,6 +119,14 @@ void DiodeRingModulatorAudioProcessorEditor::paint(juce::Graphics& g)
     g.setFont(15.0f);
     g.setFont(juce::Font("Slope Opera", 35.0f, 1));
     g.drawFittedText("NR Diode Ring Modulator", getLocalBounds(), juce::Justification::centred, 1);
+
+    //float stateWidth = getWidth() / static_cast<double> (4);
+    //float stateHeight = getHeight();
+    //int scaling = 1000;
+    //int cVal = (255 * 0.5 * (0.5 * scaling + 1), 0, 255);
+    //g.setColour(juce::Colour::fromRGBA(1, 1, 255, 127));
+    //g.fillRect((2) * stateWidth, 0 * stateHeight, stateWidth, stateHeight);
+    
 }
 
 void DiodeRingModulatorAudioProcessorEditor::resized()
@@ -103,7 +140,10 @@ void DiodeRingModulatorAudioProcessorEditor::resized()
     labelC.setBounds(0, getHeight() - 40, 140, 20);
     controlM.setBounds(140, getHeight() - 20, getWidth() - 140, 20);
     labelM.setBounds(0, getHeight() - 20, 140, 20);
-
+    inputToggle.setBounds(0, 0, 400, 20);
+    useInput.setBounds(80, 20, 40, 20);
+    micInput.setBounds(0, 20, 80, 20);
+    sineInput.setBounds(120, 20, 60, 20);
 
 }
 void DiodeRingModulatorAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)

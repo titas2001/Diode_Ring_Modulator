@@ -31,10 +31,11 @@ private:
     juce::AudioProcessorValueTreeState& audioTree;
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
+    double vout;
+    juce::Slider controlGain, controlC, controlM, useInput;
+    juce::Label labelGain, labelC, labelM, inputToggle, micInput, sineInput;
 
-    juce::Slider controlGain, controlC, controlM;
-    juce::Label labelGain, labelC, labelM;
-
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> useInputAttach;
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> sliderAttachC;
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> sliderAttachM;
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> sliderAttachGain;

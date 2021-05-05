@@ -27,7 +27,8 @@ DiodeRingModulatorAudioProcessor::DiodeRingModulatorAudioProcessor()
     audioTree(*this, nullptr, juce::Identifier("PARAMETERS"),
         { std::make_unique<juce::AudioParameterFloat>("controlM_ID","ControlM",juce::NormalisableRange<float>(24.0, 2000.0, 1.0),100.0),
         std::make_unique<juce::AudioParameterFloat>("controlC_ID","ControlC",juce::NormalisableRange<float>(0.01, 10.0, 0.01),1.0),
-        std::make_unique<juce::AudioParameterFloat>("controlGain_ID","ControlGain",juce::NormalisableRange<float>(0.01, 200.0, 0.01),10.0)
+        std::make_unique<juce::AudioParameterFloat>("controlGain_ID","ControlGain",juce::NormalisableRange<float>(0.01, 70.0, 0.01),10.0),
+        std::make_unique<juce::AudioParameterFloat>("useInput_ID", "UseInput",juce::NormalisableRange<float>(0.1, 1.1, 1.0),1.1)
         }),
     lowPassFilter(juce::dsp::IIR::Coefficients< float >::makeLowPass((48000.0 * 16.0), 20000.0))
 #endif
@@ -36,12 +37,14 @@ DiodeRingModulatorAudioProcessor::DiodeRingModulatorAudioProcessor()
     audioTree.addParameterListener("controlGain_ID", this);
     audioTree.addParameterListener("controlC_ID", this);
     audioTree.addParameterListener("controlM_ID", this);
+    audioTree.addParameterListener("useInput_ID", this);
 
 
 
     controlledM = 100.0;
     controlledC = 1.0;
     controlledGain = 10.0;
+    controlledInput = 1.1;
 
 }
 
@@ -128,6 +131,7 @@ void DiodeRingModulatorAudioProcessor::prepareToPlay(double sampleRate, int samp
     controlledM = 100.0;
     controlledC = 1.0;
     controlledGain = 10.0;
+    controlledInput = 1.1;
     voutOld = 0;
     fc = 100;
     C = 10e-9;
@@ -207,9 +211,9 @@ void DiodeRingModulatorAudioProcessor::processBlock(juce::AudioBuffer<float>& bu
     {
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
+            if (controlledInput > 1.0) vin = controlledGain * std::sin(3.14159265359 * 2.0 * argumentM);
+            else vin = controlledGain * buffer.getSample(channel, sample);
             
-            //vin = 10*buffer.getSample(channel, sample);
-            vin = controlledGain * std::sin(3.14159265359 * 2.0 * argumentM);
             c = 5.0* std::sin(3.14159265359 * 2.0 * argumentC);
             argumentC = argumentC + controlledC * T;
             argumentM = argumentM + controlledM * T;
@@ -289,8 +293,11 @@ void DiodeRingModulatorAudioProcessor::parameterChanged(const juce::String& para
     else if (parameterID == "controlC_ID") {
         controlledC = newValue;
     }
-    if (parameterID == "controlGain_ID") {
+    else if (parameterID == "controlGain_ID") {
         controlledGain = newValue;
+    }
+    else if (parameterID == "useInput_ID") {
+        controlledInput = newValue;
     }
 }
 void DiodeRingModulatorAudioProcessor::updateFilter()
